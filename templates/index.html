@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Translator — Simple & Bold</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <style>
+        /* Base */
+        :root{
+            --bg: #0b0b0d;
+            --card: #0f1720;
+            --muted: #9aa4b2;
+            --accent: #e50914; /* netflix-like red */
+            --accent-2: #ffd633; /* amazon-like yellow */
+            --btn-text: #fff;
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            min-height:100vh;
+            background:linear-gradient(180deg,#071126 0%, #071219 100%);
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color:#e6eef8;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+        }
+
+        /* Card */
+        .card{
+            width:100%;
+            max-width:780px;
+            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border-radius:12px;
+            padding:28px;
+            box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+            display:grid;
+            grid-template-columns: 1fr 360px;
+            gap:20px;
+            align-items:start;
+        }
+
+        /* Left: input */
+        .left h1{
+            margin:0 0 10px 0;
+            font-size:22px;
+            letter-spacing:0.2px;
+        }
+        .left p {
+            margin:0 0 18px 0;
+            color:var(--muted);
+            font-size:14px;
+        }
+
+        textarea{
+            width:100%;
+            min-height:180px;
+            border-radius:10px;
+            border:0;
+            padding:14px;
+            font-size:16px;
+            resize:vertical;
+            outline:none;
+            background:#071323;
+            color:#e6eef8;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        }
+
+        /* language buttons row */
+        .lang-row {
+            margin-top:14px;
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+        }
+
+        .lang-btn {
+            flex: 0 0 auto;
+            padding:10px 16px;
+            border-radius:999px;
+            background:transparent;
+            color:var(--muted);
+            border:1px solid rgba(255,255,255,0.05);
+            font-weight:600;
+            cursor:pointer;
+            transition:all .18s ease;
+            user-select:none;
+        }
+        .lang-btn.selected{
+            color:var(--btn-text);
+            background: linear-gradient(90deg,var(--accent), #ff6b6b);
+            border: none;
+            transform:translateY(-2px);
+            box-shadow: 0 6px 18px rgba(229,9,20,0.24);
+        }
+
+        /* main action */
+        .actions{
+            display:flex;
+            gap:12px;
+            margin-top:18px;
+        }
+        .btn-primary{
+            padding:12px 18px;
+            border-radius:10px;
+            border:0;
+            font-weight:700;
+            cursor:pointer;
+            background:var(--accent);
+            color:var(--btn-text);
+            box-shadow: 0 8px 24px rgba(229,9,20,0.2);
+            transition:transform .12s ease, box-shadow .12s ease;
+        }
+        .btn-primary:hover{ transform:translateY(-3px); box-shadow: 0 14px 40px rgba(229,9,20,0.26); }
+
+        .btn-ghost{
+            padding:12px 18px;
+            border-radius:10px;
+            border:1px solid rgba(255,255,255,0.06);
+            background:transparent;
+            color:var(--muted);
+            font-weight:600;
+            cursor:pointer;
+        }
+
+        /* Right: output */
+        .right {
+            padding:18px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border-radius:10px;
+            min-height:260px;
+        }
+        .right h3{
+            margin:0 0 10px 0;
+            font-size:16px;
+        }
+        .output {
+            margin-top:12px;
+            background:#020612;
+            padding:14px;
+            border-radius:8px;
+            min-height:160px;
+            color:#dbeafe;
+            font-size:16px;
+            line-height:1.5;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        }
+        .meta {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            color:var(--muted);
+            font-size:13px;
+            margin-bottom:10px;
+        }
+        .lang-pill {
+            padding:6px 10px;
+            border-radius:999px;
+            background:rgba(255,255,255,0.03);
+            color:var(--muted);
+            font-weight:700;
+            font-size:13px;
+        }
+
+        /* responsive */
+        @media (max-width:880px){
+            .card{ grid-template-columns: 1fr; }
+            .right{ order:2; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="left">
+            <h1>Simple Translator</h1>
+            <p>Type a sentence below, pick a language, then press <strong>TRANSLATE</strong>. Clean, fast and bold.</p>
+
+            <form id="translateForm" method="POST">
+                <textarea name="text" id="inputText" placeholder="Type or paste text here..." required>{{ request.form.text or "" }}</textarea>
+
+                <div class="lang-row" role="list">
+                    <!-- each button sets the hidden input value -->
+                    <button type="button" class="lang-btn selected" data-lang="hi">हिन्दी</button>
+                    <button type="button" class="lang-btn" data-lang="mr">मराठी</button>
+                    <button type="button" class="lang-btn" data-lang="ta">தமிழ்</button>
+                    <button type="button" class="lang-btn" data-lang="bn">বাংলা</button>
+                    <button type="button" class="lang-btn" data-lang="gu">ગુજરાતી</button>
+                    <button type="button" class="lang-btn" data-lang="fr">Français</button>
+                    <button type="button" class="lang-btn" data-lang="es">Español</button>
+                </div>
+
+                <!-- hidden input to hold chosen language -->
+                <input type="hidden" name="lang" id="langInput" value="hi" />
+
+                <div class="actions">
+                    <button class="btn-primary" type="submit">TRANSLATE</button>
+                    <button class="btn-ghost" type="button" id="clearBtn">CLEAR</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="right">
+            <div class="meta">
+                <div class="lang-pill" id="currentLang">Hindi</div>
+                <div class="spacer" style="flex:1"></div>
+                <div class="meta" title="Tip">Press CLEAR to reset</div>
+            </div>
+
+            <h3>Translated Text</h3>
+            <div class="output" id="outputArea">
+                {% if output %}
+                    {{ output }}
+                {% else %}
+                    <span style="color:var(--muted)">Translation will appear here after you press TRANSLATE.</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // language buttons behavior
+        const langBtns = document.querySelectorAll('.lang-btn');
+        const langInput = document.getElementById('langInput');
+        const currentLang = document.getElementById('currentLang');
+        const nameMap = {
+            'hi': 'Hindi',
+            'mr': 'Marathi',
+            'ta': 'Tamil',
+            'bn': 'Bengali',
+            'gu': 'Gujarati',
+            'fr': 'Français',
+            'es': 'Español'
+        };
+
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // remove selected
+                langBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+
+                // set hidden input
+                const lang = btn.getAttribute('data-lang');
+                langInput.value = lang;
+
+                // update pill text
+                currentLang.textContent = nameMap[lang] || lang;
+            });
+        });
+
+        // clear button
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputArea').innerHTML = '<span style="color:var(--muted)">Translation will appear here after you press TRANSLATE.</span>';
+        });
+    </script>
+</body>
+</html>
